@@ -1,0 +1,40 @@
+.root {
+  background-color: #fff;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 30px;
+}
+
+.inner {
+  display: flex;
+  justify-content: space-between;
+}
+
+.logo {
+  background-color: rgb(255, 255, 255);
+  color: #0080ff;
+  font-weight: 700;
+  line-height: 35px;
+  text-transform: uppercase;
+  letter-spacing: 0.15px;
+  border-radius: 5px;
+  padding: 0 10px;
+  text-decoration: none;
+  transition: all .5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    background-color: #0080ff;
+    color: white;
+    scale: 1.1;
+  }
+}
+
+.buttons {
+  button {
+    margin-left: 10px;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}
