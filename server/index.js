@@ -7,7 +7,7 @@ import cors from 'cors';
 //const uri = "mongodb+srv://root:root@merncluster0.un78qos.mongodb.net/?retryWrites=true&w=majority&appName=merncluster0";
 
 
-import { registerValidation, loginValidation, postCreateValidation } from './validations.js';
+import { registerValidation, loginValidation, postCreateValidation, commentCreateValidation } from './validations.js';
 
 import { handleValidationErrors, checkAuth } from './utils/index.js';
 
@@ -51,7 +51,6 @@ const storage = multer.diskStorage({
     },
 });
 
-
 const upload = multer({ storage });
 
 const app = express();
@@ -76,18 +75,19 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 app.get('/tags', PostController.getLastTags);
 
 app.get('/posts', PostController.getAll);
+app.get('/posts/withtags', PostController.getByTags);
 app.get('/posts/tags', PostController.getLastTags);
 app.get('/posts/:id', PostController.getOne);
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 app.delete('/posts/:id', checkAuth, PostController.remove);
-app.put(
-    '/posts/:id',
-    checkAuth,
-    postCreateValidation,
-    handleValidationErrors,
-    PostController.update,
-);
+app.put('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update,);
+app.put('/posts/like/:id', checkAuth, PostController.likePost);
 
+app.post('/comments/:id', checkAuth, commentCreateValidation, handleValidationErrors, PostController.createComment);
+app.get('/comments', PostController.getAllComments);
+app.delete('/comments', checkAuth, PostController.removeComment);
+app.put('/comments/:id', checkAuth, commentCreateValidation, handleValidationErrors, PostController.updateComment);
+app.put('/comments/like/:id', checkAuth, PostController.likeComment);
 
 app.listen(process.env.PORT || 4444, (err) => {
     if (err) {

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 
 const PostSchema = new mongoose.Schema(
   {
@@ -9,7 +9,6 @@ const PostSchema = new mongoose.Schema(
     text: {
       type: String,
       required: true,
-      unique: true,
     },
     tags: {
       type: Array,
@@ -19,15 +18,23 @@ const PostSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    likesCount: {
-      type: Number,
-      default: 0,
-    },
+    likesCount: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
+      }
+    ],
     imageUrl: String,
   },
   {
