@@ -33,6 +33,21 @@ export const getAll = async (req, res) => {
   }
 };
 
+export const getByPopularity = async (req, res) => {
+  try {
+    const posts = await PostModel.find()
+      .sort({'viewsCount': 1, 'likesCount': 1, 'commentsCount': 1})
+      .populate('user').populate('comments')
+      .exec();
+    res.json(posts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не удалось получить данные',
+    });
+  }
+};
+
 export const getOne = async (req, res) => {
   try {
     const postId = req.params.id;
