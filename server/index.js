@@ -71,6 +71,7 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
         url: `/uploads/${req.file.originalname}`,
     });
 });
+app.delete('delete-image/:imageURL', PostController.removeImage);
 
 app.get('/tags', PostController.getLastTags);
 

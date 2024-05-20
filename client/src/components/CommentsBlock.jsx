@@ -12,6 +12,7 @@ import Skeleton from "@mui/material/Skeleton";
 export const CommentsBlock = ({ data,
   comments,
   setComments, authorId, children, isLoading = true }) => {
+    console.log(JSON.stringify(comments))
   return (
     <SideBlock title="Комментарии">
       <List>

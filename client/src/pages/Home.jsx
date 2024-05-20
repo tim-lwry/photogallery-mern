@@ -12,7 +12,7 @@ import { fetchComments, fetchPosts, fetchSortByNewest, fetchSortByPopularity, fe
 export const Home = () => {
   const [value, setValue] = React.useState(0);
   const dispatch = useDispatch();
-
+  const userData = useSelector((state) => state.auth.data);
   const { posts, tags, comments } = useSelector((state) => state.posts);
 
   const isPostLoading = posts.status === "loading";
@@ -39,10 +39,10 @@ export const Home = () => {
 
   return (
     <>
-      <Tabs style={{ marginBottom: 15 }} value={0} aria-label="basic tabs example"
+      <Tabs style={{ marginBottom: 15 }} value={value} aria-label="basic tabs example"
       onChange={handleChange}>
-        <Tab onClick={onSortByNewest} label="Новые" />
-        <Tab onClick={onSortByPopularity} label="Популярные" />
+        <Tab value={0} onClick={onSortByPopularity} label="Популярные" />
+        <Tab value={1} onClick={onSortByNewest} label="Новые" />
       </Tabs>
       <Grid container spacing={4}>
         <Grid xs={8} item>
@@ -56,16 +56,16 @@ export const Home = () => {
                 title={obj.title}
                 imageUrl={
                   obj.imageUrl
-                    ? `http://localhost:4444/uploads/${obj.imageUrl}`
+                    ? `${axios.defaults.baseURL}${obj.imageUrl}`
                     : ""
                 }
                 user={obj.user}
                 createdAt={new Date(obj.createdAt).toLocaleString('ru-RU')}
-                likesCount={obj.likesCount.length}
+                likesCount={obj.likesCount}
                 viewsCount={obj.viewsCount}
                 commentsCount={obj.comments.length}
                 tags={obj.tags}
-                isEditable={false}//{userData?._id === obj.user?._id}
+                isEditable={userData?._id === obj.user?._id}
               />
             )
           )}

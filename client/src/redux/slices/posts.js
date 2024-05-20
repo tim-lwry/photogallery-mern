@@ -26,6 +26,13 @@ export const fetchRemovePost = createAsyncThunk(
   }
 );
 
+export const fetchLikePost = createAsyncThunk(
+  "posts/fetchLikePost",
+  async (id) => {
+    await axios.put(`/posts/like/${id}`);
+  }
+);
+
 export const fetchSortByNewest = createAsyncThunk(
   "posts/fetchSortByNewest",
   async () => {
@@ -53,6 +60,9 @@ const initialState = {
     items: [],
     status: "loading",
   },
+  likes: {
+    items: []
+  }
 };
 
 const postsSlice = createSlice({
@@ -85,6 +95,11 @@ const postsSlice = createSlice({
       state.tags.status = "error";
     },
     // Удаление статьи
+    [fetchLikePost.fulfilled]: (state, action) => {
+      state.likes.items.push(action.payload);
+    },
+
+    // Лайк статьи
     [fetchRemovePost.pending]: (state, action) => {
       state.posts.items = state.posts.items.filter(
         (obj) => obj._id !== action.meta.arg

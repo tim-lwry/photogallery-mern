@@ -1,5 +1,7 @@
 import PostModel from '../models/Post.js';
 import CommentModel from '../models/Comment.js';
+import User from '../models/User.js';
+import { unlink } from 'fs';
 
 export const getLastTags = async (req, res) => {
   try {
@@ -36,7 +38,7 @@ export const getAll = async (req, res) => {
 export const getByPopularity = async (req, res) => {
   try {
     const posts = await PostModel.find()
-      .sort({'viewsCount': 1, 'likesCount': 1, 'commentsCount': 1})
+      .sort({ 'viewsCount': 1, 'likesCount': 1, 'commentsCount': 1 })
       .populate('user').populate('comments')
       .exec();
     res.json(posts);
@@ -55,7 +57,14 @@ export const getOne = async (req, res) => {
     await PostModel.findOneAndUpdate(
       { _id: postId }, { $inc: { viewsCount: 1 } }, { returnDocument: "After" })
       .populate('user') // only works for model type, then will change the type to json
-      .populate('comments')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'user',
+          model: User,
+          select: "_id fullName nickname avatarUrl"
+        }
+      })
       .then(doc => res.json(doc))
       .catch(err => res.status(500).json({ message: "Не удалось получить данные" }));
   } catch (err) {
@@ -98,7 +107,15 @@ export const remove = async (req, res) => {
       return res.status(500).json({ message: "Нет доступа" });
     }
 
-    PostModel.findOneAndDelete({ _id: postId, })
+    const comments = await PostModel.findOne({ _id: [postId] }).then(doc => {
+      doc.likesCount = [];
+      doc.save();
+      return doc.comments;
+    });
+    comments.map(comment => comment._id.toString());
+    await CommentModel.deleteMany({ _id: { $in: comments } });
+
+    await PostModel.findOneAndDelete({ _id: postId })
       .then(doc => res.status(200).json({ message: "Пост успешно удален!" }))
       .catch(err => res.status(500).json({ message: "Не удалось удалить данные" }));
   } catch (err) {
@@ -143,7 +160,7 @@ export const update = async (req, res) => {
         }
       });
 
-    console.log(checkUser + " " + req.userId + "| RES="+ (checkUser===req.userId));
+    console.log(checkUser + " " + req.userId + "| RES=" + (checkUser === req.userId));
     if ((checkUser !== req.userId)) {
       return res.status(500).json({ message: "Нет доступа" });
     }
@@ -194,7 +211,7 @@ export const likePost = async (req, res) => {
 
     console.log(post.likesCount)
 
-    return res.json(data);
+    return res.json(data.likesCount);
 
   } catch (err) {
     console.log(err);
@@ -331,6 +348,25 @@ export const removeComment = async (req, res) => {
     console.log(err);
     res.status(500).json({
       message: 'Не удалось получить данные',
+    });
+  }
+};
+
+export const removeImage = async (req, res) => {
+  try {
+    const imageUrl = req.params.imageUrl;
+
+    await unlink(
+      path.resolve(imageUrl),
+      (error) => {
+        if (error) throw error;
+      }
+    );
+    
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не удалось удалить изображение',
     });
   }
 };
