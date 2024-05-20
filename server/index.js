@@ -34,7 +34,7 @@ const clientOptions = {}//serverApi: { version: '1', strict: true, deprecationEr
 
 
 await mongoose.connect(
-    process.env.MONGODB_URI || localuri, clientOptions
+    process.env.MONGO_DB_URI || localuri, clientOptions
 ).then(() => console.log("Successfully connected to DB"))
     .catch((err) => console.log("DB connection failed: " + err));
 
